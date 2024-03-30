@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCodeDto } from 'src/dtos';
 import { Code } from 'src/entities';
 
@@ -12,7 +12,11 @@ export class CodeService {
     return this.codeRepository.save(createCodeDto);
   }
 
-  async getOne(id: string): Promise<Code | null> {
-    return this.codeRepository.findOne({ where: { id } });
+  async getOne(id: string): Promise<Code> {
+    const code = await this.codeRepository.findOne({ where: { id } });
+    if (!code || code === null) {
+      throw new NotFoundException('Code not found');
+    }
+    return code;
   }
 }
